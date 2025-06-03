@@ -1,5 +1,22 @@
 docker-compose.yml
-ninfo/local_plugins/*
-!ninfo/local_plugins/.gitkeep
+build/local_plugins/*
+build/plugins.json
+!build/local_plugins/.gitkeep
 .env
 build.log
+ninfo/ninfo.ini
+
+nginx/logs/*
+!nginx/logs/.gitkeep
+
+# py Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
