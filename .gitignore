@@ -1,0 +1,5 @@
+docker-compose.yml
+ninfo/local_plugins/*
+!ninfo/local_plugins/.gitkeep
+.env
+build.log
