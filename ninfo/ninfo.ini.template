@@ -1,0 +1,12 @@
+[plugin:misp]
+api_key=K3yg0Esh3re
+url=https://misp.example.com
+verifycert=True
+
+[plugin:virustotal]
+api_key=79c860e7182ad68d5b3bac2345679d5682da6e36ff9681b582f8d682069156bf
+
+[plugin:malwarebazaar]
+api_key=99782405bb79ce2fd1c17f2674477056e22859a6
+
+

@@ -1,0 +1,50 @@
+version: '3'
+services:
+  ninfo-www:
+    build:
+      context: build/
+      args:
+        - CUSTOM_GIT_REPOS=${CUSTOM_GIT_REPOS:-}
+    volumes:
+      - static_volume:/app/staticfiles
+      - "./ninfo/ninfo.ini:/app/ninfo.ini"
+      - django_db:/app/db/
+    env_file: ".env"
+    expose:
+      - 8000
+    networks:
+      - ninfo
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/var/www/staticfiles
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - ninfo-www 
+    restart: unless-stopped
+    networks:
+      - web
+      - ninfo
+    expose:
+      - 80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ninfo.tls=true"
+      - "traefik.http.routers.ninfo.rule=Host(`ninfo.example.com`)"
+      - "traefik.http.routers.ninfo.service=ninfo-80"
+      - "traefik.http.services.ninfo-80.loadbalancer.server.port=80"
+      - "traefik.http.services.ninfo-80.loadbalancer.server.scheme=http"
+      - "traefik.http.routers.ninfo.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ninfo.tls.domains[0].main=ninfo.example.com"
+
+volumes:
+  static_volume:
+  django_db:
+
+networks:
+  ninfo:
+  web:
+    external: true
+

@@ -1,0 +1,8 @@
+setuptools
+markupsafe
+django
+2to3
+aiohttp
+aiodns
+gunicorn
+
