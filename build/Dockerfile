@@ -1,4 +1,7 @@
-FROM python:3.11-alpine as builder
+FROM python:3-alpine AS builder
+
+ARG CUSTOM_GIT_REPOS
+ENV CUSTOM_GIT_REPOS $CUSTOM_GIT_REPOS
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -45,7 +48,7 @@ RUN for dir in ninfo django-ninfo $(find . -maxdepth 1 -type d -not -path "./nin
 
 # Stage 2
 
-FROM python:3.11-alpine
+FROM python:3-alpine
 
 RUN apk add --no-cache jq shadow tzdata && \
     rm -rf /var/cache/apk/*
