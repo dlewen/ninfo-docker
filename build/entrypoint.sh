@@ -1,13 +1,8 @@
 #!/bin/sh
 set -e
 
-# configure ninfo_www settings.php
-sed "s/SECRET_KEY = .*/SECRET_KEY = '${DJANGO_SECRET_KEY}'/" /app/ninfo_www/settings.py > tmp; cat tmp > /app/ninfo_www/settings.py; rm tmp
-sed "s/DEBUG = .*/DEBUG = '${DJANGO_DEBUG}'/" /app/ninfo_www/settings.py > tmp; cat tmp > /app/ninfo_www/settings.py; rm tmp
-sed "s/ALLOWED_HOSTS = .*/ALLOWED_HOSTS = ['${DJANGO_ALLOWED_HOSTS}']/" /app/ninfo_www/settings.py > tmp; cat tmp > /app/ninfo_www/settings.py; rm tmp
-sed "s/CSRF_TRUSTED_ORIGINS = .*/CSRF_TRUSTED_ORIGINS = ['${DJANGO_ALLOWED_HOSTS}']/" /app/ninfo_www/settings.py > tmp; cat tmp > /app/ninfo_www/settings.py; rm tmp
-
-
+# Settings are now configured via environment variables in settings.py
+# No need to modify files at runtime with sed
 
 
 echo "Running migrations..."
@@ -30,4 +25,3 @@ echo "Superuser password updated."
 
 echo "Starting application as user $(id -u):$(id -g)..."
 exec "$@"
-
