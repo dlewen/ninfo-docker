@@ -22,15 +22,17 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY local_plugins /plugins
 RUN git clone https://github.com/ninfo-py/ninfo.git ninfo && \
-    git clone https://github.com/dlewen/django-ninfo.git django-ninfo && \
-    if [ -n "$CUSTOM_GIT_REPOS" ]; then \
+    git clone https://github.com/dlewen/django-ninfo.git django-ninfo
+
+ARG CUSTOM_GIT_REPOS
+ENV CUSTOM_GIT_REPOS $CUSTOM_GIT_REPOS
+RUN if [ -n "$CUSTOM_GIT_REPOS" ]; then \
     echo "$CUSTOM_GIT_REPOS" | tr ',' '\n' | while read repo; do \
     if [ -n "$repo" ]; then \
     git clone "$repo" "$(basename $repo .git)"; \
     fi; \
     done; \
     fi
-
 
 RUN for dir in ninfo django-ninfo $(find . -maxdepth 1 -type d -not -path "./ninfo" -not -path "./django-ninfo" -not -path "." -not -path ".." | grep -v "\.git$") ; do \
     if [ -f "$dir/setup.py" ]; then \
