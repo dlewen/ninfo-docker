@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from django_ninfo.oidc_settings import get_oidc_settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_ninfo",
+    "mozilla_django_oidc",
 ]
 
 MIDDLEWARE = [
@@ -56,6 +58,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "mozilla_django_oidc.middleware.SessionRefresh",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -73,6 +76,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django_ninfo.context_processors.oidc_enabled",
             ],
         },
     },
@@ -136,3 +140,13 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# OIDC authentication (conditional — enabled when OIDC_RP_CLIENT_ID is set)
+# Supports Keycloak, Azure Entra, or any OIDC provider via env vars.
+_oidc = get_oidc_settings()
+AUTHENTICATION_BACKENDS = _oidc["AUTHENTICATION_BACKENDS"]
+LOGIN_URL = _oidc["LOGIN_URL"]
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+locals().update({k: v for k, v in _oidc.items()
+                 if k not in ("AUTHENTICATION_BACKENDS", "LOGIN_URL")})
