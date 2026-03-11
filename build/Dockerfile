@@ -35,13 +35,13 @@ RUN if [ -n "$CUSTOM_GIT_REPOS" ]; then \
     fi
 
 RUN for dir in ninfo django-ninfo $(find . -maxdepth 1 -type d -not -path "./ninfo" -not -path "./django-ninfo" -not -path "." -not -path ".." | grep -v "\.git$") ; do \
-    if [ -f "$dir/setup.py" ]; then \
+    if [ -f "$dir/setup.py" ] || [ -f "$dir/pyproject.toml" ]; then \
     cd "$dir" && pip wheel --no-cache-dir --wheel-dir /app/wheels . && cd ..; \
     fi; \
     done; \
     cd /plugins; \
     for dir in $(find /plugins -maxdepth 1 -type d -not -path "." -not -path ".." | grep -v "\.git$"); do \
-    if [ -f "$dir/setup.py" ]; then \
+    if [ -f "$dir/setup.py" ] || [ -f "$dir/pyproject.toml" ]; then \
     cd "$dir" && pip wheel --no-cache-dir --wheel-dir /app/wheels . && cd ..; \
     fi; \
     done;
