@@ -39,6 +39,9 @@ ALLOWED_HOSTS = [
 _scheme = os.environ.get("DJANGO_URL_SCHEME", "https")
 CSRF_TRUSTED_ORIGINS = [f"{_scheme}://{host}" for host in ALLOWED_HOSTS]
 
+# Trust the X-Forwarded-Proto header from the reverse proxy (Traefik → Nginx)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Application definition
 
 INSTALLED_APPS = [
