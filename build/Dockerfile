@@ -76,6 +76,7 @@ RUN chown -R ninfo:ninfo /app /wheels
 
 USER ninfo
 RUN pip install --no-cache-dir --user --upgrade pip && \
+    pip install --no-cache-dir --user setuptools && \
     for wheel in /wheels/*.whl; do \
     if pip install --no-cache-dir --user --no-deps --find-links=/wheels/ "$wheel" 2>/dev/null; then \
     echo "Successfully installed $wheel"; \
