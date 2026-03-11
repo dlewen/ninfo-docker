@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip wheel --no-cache-dir --wheel-dir /app/wheels -r requirements.txt
 
 COPY local_plugins /plugins
-RUN git clone https://github.com/ninfo-py/ninfo.git ninfo && \
+RUN git clone https://github.com/dlewen/ninfo.git ninfo && \
     git clone https://github.com/dlewen/django-ninfo.git django-ninfo
 
 ARG CUSTOM_GIT_REPOS
