@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip wheel --no-cache-dir --wheel-dir /app/wheels -r requirements.txt
 
 COPY local_plugins /plugins
+COPY mcp /mcp
 RUN git clone https://github.com/dlewen/ninfo.git ninfo && \
     git clone https://github.com/dlewen/django-ninfo.git django-ninfo
 
@@ -44,7 +45,8 @@ RUN for dir in ninfo django-ninfo $(find . -maxdepth 1 -type d -not -path "./nin
     if [ -f "$dir/setup.py" ] || [ -f "$dir/pyproject.toml" ]; then \
     cd "$dir" && pip wheel --no-cache-dir --wheel-dir /app/wheels . && cd ..; \
     fi; \
-    done;
+    done; \
+    cd /mcp && pip wheel --no-cache-dir --wheel-dir /app/wheels .
 
 
 

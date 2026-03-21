@@ -39,6 +39,40 @@ services:
       - "traefik.http.routers.ninfo.tls.certresolver=letsencrypt"
       - "traefik.http.routers.ninfo.tls.domains[0].main=ninfo.example.com"
 
+  ninfo-mcp:
+    build:
+      context: build/
+      args:
+        - CUSTOM_GIT_REPOS=${CUSTOM_GIT_REPOS:-}
+    volumes:
+      - "./ninfo/ninfo.ini:/app/ninfo.ini"
+    env_file: ".env"
+    environment:
+      - NINFO_DJANGO_URL=http://ninfo-www:8000
+    command: ["ninfo-mcp"]
+    expose:
+      - 8001
+    depends_on:
+      - ninfo-www
+    networks:
+      - ninfo
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ninfo-mcp.tls=true"
+      - "traefik.http.routers.ninfo-mcp.rule=Host(`ninfo-mcp.example.com`)"
+      - "traefik.http.routers.ninfo-mcp.service=ninfo-mcp-8001"
+      - "traefik.http.services.ninfo-mcp-8001.loadbalancer.server.port=8001"
+      - "traefik.http.routers.ninfo-mcp.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ninfo-mcp.tls.domains[0].main=ninfo.example.com"
+
+  memcached:
+    image: memcached:alpine
+    expose:
+      - 11211
+    networks:
+      - ninfo
+
 volumes:
   static_volume:
   django_db:

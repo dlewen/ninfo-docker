@@ -1,0 +1,10 @@
+pyproject.toml
+src/ninfo_mcp/__init__.py
+src/ninfo_mcp/server.py
+src/ninfo_mcp.egg-info/PKG-INFO
+src/ninfo_mcp.egg-info/SOURCES.txt
+src/ninfo_mcp.egg-info/dependency_links.txt
+src/ninfo_mcp.egg-info/entry_points.txt
+src/ninfo_mcp.egg-info/requires.txt
+src/ninfo_mcp.egg-info/top_level.txt
+tests/test_server.py
