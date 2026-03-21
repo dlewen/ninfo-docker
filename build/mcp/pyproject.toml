@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ninfo-mcp"
+version = "0.1.0"
+description = "MCP server for ninfo threat intelligence"
+requires-python = ">=3.10"
+dependencies = ["fastmcp", "ninfo", "httpx"]
+
+[project.scripts]
+ninfo-mcp = "ninfo_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
