@@ -1,2 +1,0 @@
-[console_scripts]
-ninfo-mcp = ninfo_mcp.server:main
