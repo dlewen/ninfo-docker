@@ -29,9 +29,6 @@ from fastmcp import FastMCP, Context
 from fastmcp.server.middleware import Middleware, MiddlewareContext
 from fastmcp.server.dependencies import get_http_headers
 from fastmcp.exceptions import ToolError
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-
 from ninfo import Ninfo
 
 log = logging.getLogger("ninfo_mcp")
@@ -187,22 +184,6 @@ mcp = FastMCP(
 mcp.add_middleware(DjangoTokenAuthMiddleware(django_url=NINFO_DJANGO_URL, token_ttl=TOKEN_TTL))
 mcp.add_middleware(RateLimitMiddleware(limit=RATE_LIMIT))
 
-
-# --- Health Endpoint ---
-
-
-@mcp.custom_route("/health", methods=["GET"])
-async def health(request: Request) -> JSONResponse:
-    """Health check endpoint. Returns JSON status and loaded plugin count."""
-    n = _get_ninfo()
-    return JSONResponse(
-        {
-            "status": "ok",
-            "plugins": sorted(n.plugin_modules.keys()),
-            "django_url": NINFO_DJANGO_URL,
-            "rate_limit": RATE_LIMIT,
-        }
-    )
 
 
 # --- Ninfo Lazy Init ---
