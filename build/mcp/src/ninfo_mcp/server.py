@@ -256,7 +256,7 @@ def ninfo_query(query: str, plugin: str | None = None) -> str:
                 return f"No results from plugin '{plugin}' for query '{query}'"
 
             p = n.get_plugin(plugin)
-            return f"=== {p.title} ({p.description}) ===\n{text}"
+            return f"## {p.name}\n\n{text}"
         except Exception as e:
             log.exception("Error querying plugin %s", plugin)
             return f"Error querying plugin '{plugin}': {e}"
@@ -267,10 +267,10 @@ def ninfo_query(query: str, plugin: str | None = None) -> str:
         try:
             text = p.render_template("text", query, result)
             if text:
-                results.append(f"=== {p.title} ({p.description}) ===\n{text}")
+                results.append(f"## {p.name}\n\n{text}")
         except Exception as e:
             log.exception("Error rendering plugin %s", p.name)
-            results.append(f"=== {p.title} ===\nError: {e}")
+            results.append(f"## {p.name}\n\nError: {e}")
 
     if not results:
         return f"No compatible plugins found for query '{query}'"
