@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_ninfo",
     "mozilla_django_oidc",
+    "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -143,6 +145,22 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Django REST Framework — supports both session auth (browser) and token auth (API clients)
+# TokenAuthentication uses "Authorization: Token <key>" header format.
+# UserRateThrottle limits authenticated users to 100 requests/hour.
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "100/hour",
+    },
+}
 
 # OIDC authentication (conditional — enabled when OIDC_RP_CLIENT_ID is set)
 # Supports Keycloak, Azure Entra, or any OIDC provider via env vars.
