@@ -82,6 +82,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django_ninfo.context_processors.oidc_enabled",
+                "django_ninfo.context_processors.multi_search_config",
             ],
         },
     },
@@ -161,6 +162,26 @@ REST_FRAMEWORK = {
         "user": "100/hour",
     },
 }
+
+# Session lifetime (default 2 weeks). Set via SESSION_COOKIE_AGE env var (seconds).
+SESSION_COOKIE_AGE = int(os.environ.get("SESSION_COOKIE_AGE", "1209600"))
+
+# OIDC token refresh interval (default 15 min). Controls how often Django checks
+# with the IdP. Set via OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS env var (seconds).
+OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS = int(os.environ.get("OIDC_RENEW_ID_TOKEN_EXPIRY_SECONDS", "900"))
+
+# Multi-search plugin configuration
+# Comma-separated plugin names that are checked by default in multi-search.
+# If empty, all plugins are checked by default.
+NINFO_MULTI_DEFAULT_PLUGINS = [p.strip() for p in os.environ.get("NINFO_MULTI_DEFAULT_PLUGINS", "").split(",") if p.strip()]
+
+# Comma-separated plugin names hidden from multi-search view.
+NINFO_MULTI_HIDDEN_PLUGINS = [p.strip() for p in os.environ.get("NINFO_MULTI_HIDDEN_PLUGINS", "").split(",") if p.strip()]
+
+# Settings dropdown links
+NINFO_MCP_URL = os.environ.get("NINFO_MCP_URL", "")
+NINFO_CUSTOM_LINK_LABEL = os.environ.get("NINFO_CUSTOM_LINK_LABEL", "")
+NINFO_CUSTOM_LINK_URL = os.environ.get("NINFO_CUSTOM_LINK_URL", "")
 
 # OIDC authentication (conditional — enabled when OIDC_RP_CLIENT_ID is set)
 # Supports Keycloak, Azure Entra, or any OIDC provider via env vars.
