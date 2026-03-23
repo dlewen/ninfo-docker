@@ -92,7 +92,7 @@ RUN rm -rf /wheels
 
 USER ninfo
 
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput --clear
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
