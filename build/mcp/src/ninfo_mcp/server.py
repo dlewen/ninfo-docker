@@ -52,6 +52,8 @@ class DjangoTokenAuthMiddleware(Middleware):
     initialize phase before HTTP context is established. At that point
     get_http_headers() returns None, making auth impossible. on_call_tool
     fires only when tools are actually invoked, when HTTP context IS available.
+    get_http_headers() filters the authorization header by default; passing
+    include={"authorization"} is required to whitelist it for extraction.
     """
 
     def __init__(
@@ -106,7 +108,7 @@ class DjangoTokenAuthMiddleware(Middleware):
             raise ToolError("Access denied: auth service error")
 
     async def on_call_tool(self, context: MiddlewareContext, call_next):
-        headers = get_http_headers() or {}
+        headers = get_http_headers(include={"authorization"}) or {}
         auth_header = headers.get("authorization", "")
 
         if not auth_header.startswith("Bearer "):
