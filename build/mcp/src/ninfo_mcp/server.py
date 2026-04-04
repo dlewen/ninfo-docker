@@ -47,7 +47,11 @@ class DjangoTokenAuthMiddleware(Middleware):
     @decision DEC-AUTH-001
     @title Django /api/me/ token validation with in-memory TTL cache
     @status accepted
-    @rationale See module docstring.
+    @rationale See module docstring. Auth is performed in on_call_tool (not
+    on_request) because FastMCP 2.13+ fires on_request during the MCP
+    initialize phase before HTTP context is established. At that point
+    get_http_headers() returns None, making auth impossible. on_call_tool
+    fires only when tools are actually invoked, when HTTP context IS available.
     """
 
     def __init__(
@@ -101,7 +105,7 @@ class DjangoTokenAuthMiddleware(Middleware):
             )
             raise ToolError("Access denied: auth service error")
 
-    async def on_request(self, context: MiddlewareContext, call_next):
+    async def on_call_tool(self, context: MiddlewareContext, call_next):
         headers = get_http_headers() or {}
         auth_header = headers.get("authorization", "")
 
@@ -145,7 +149,7 @@ class RateLimitMiddleware(Middleware):
         self._windows: dict[str, list[float]] = defaultdict(list)
         log.info("RateLimitMiddleware: %d requests/hour per user", self._limit)
 
-    async def on_request(self, context: MiddlewareContext, call_next):
+    async def on_call_tool(self, context: MiddlewareContext, call_next):
         username = None
         if context.fastmcp_context:
             username = context.fastmcp_context.get_state("username")
