@@ -205,11 +205,11 @@ class TestDjangoTokenAuthMiddlewareValidation:
 
 
 # ---------------------------------------------------------------------------
-# DjangoTokenAuthMiddleware — on_request flow
+# DjangoTokenAuthMiddleware — on_call_tool flow
 # ---------------------------------------------------------------------------
 
 
-class TestDjangoTokenAuthMiddlewareOnRequest:
+class TestDjangoTokenAuthMiddlewareOnCallTool:
     @pytest.mark.asyncio
     async def test_missing_auth_header_raises_tool_error(self):
         from fastmcp.exceptions import ToolError
@@ -219,7 +219,7 @@ class TestDjangoTokenAuthMiddlewareOnRequest:
 
         with patch("ninfo_mcp.server.get_http_headers", return_value={}):
             with pytest.raises(ToolError, match="missing or invalid"):
-                await m.on_request(ctx, _call_next)
+                await m.on_call_tool(ctx, _call_next)
 
     @pytest.mark.asyncio
     async def test_non_bearer_header_raises_tool_error(self):
@@ -233,7 +233,7 @@ class TestDjangoTokenAuthMiddlewareOnRequest:
             return_value={"authorization": "Basic abc123"},
         ):
             with pytest.raises(ToolError, match="missing or invalid"):
-                await m.on_request(ctx, _call_next)
+                await m.on_call_tool(ctx, _call_next)
 
     @pytest.mark.asyncio
     async def test_cached_token_skips_http_call(self):
@@ -243,7 +243,7 @@ class TestDjangoTokenAuthMiddlewareOnRequest:
 
         with patch("ninfo_mcp.server.get_http_headers", return_value={"authorization": "Bearer cached-tok"}):
             with patch("ninfo_mcp.server.httpx.AsyncClient") as mock_http:
-                result = await m.on_request(ctx, _call_next)
+                result = await m.on_call_tool(ctx, _call_next)
 
         mock_http.assert_not_called()
         assert result == "ok"
@@ -264,7 +264,7 @@ class TestDjangoTokenAuthMiddlewareOnRequest:
                 mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
                 mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
 
-                result = await m.on_request(ctx, _call_next)
+                result = await m.on_call_tool(ctx, _call_next)
 
         assert m._get_cached("fresh-tok") == "grace"
         assert result == "ok"
@@ -282,7 +282,7 @@ class TestRateLimitMiddleware:
         ctx = _make_middleware_context(username="henry")
 
         for _ in range(5):
-            result = await m.on_request(ctx, _call_next)
+            result = await m.on_call_tool(ctx, _call_next)
         assert result == "ok"
 
     @pytest.mark.asyncio
@@ -293,10 +293,10 @@ class TestRateLimitMiddleware:
         ctx = _make_middleware_context(username="ivan")
 
         for _ in range(3):
-            await m.on_request(ctx, _call_next)
+            await m.on_call_tool(ctx, _call_next)
 
         with pytest.raises(ToolError, match="Rate limit exceeded"):
-            await m.on_request(ctx, _call_next)
+            await m.on_call_tool(ctx, _call_next)
 
     @pytest.mark.asyncio
     async def test_no_username_skips_rate_limit(self):
@@ -304,7 +304,7 @@ class TestRateLimitMiddleware:
         ctx = _make_middleware_context()  # no username
 
         for _ in range(3):
-            result = await m.on_request(ctx, _call_next)
+            result = await m.on_call_tool(ctx, _call_next)
         assert result == "ok"
 
     @pytest.mark.asyncio
@@ -314,12 +314,12 @@ class TestRateLimitMiddleware:
 
         now = 10000.0
         monkeypatch.setattr(time, "monotonic", lambda: now)
-        await m.on_request(ctx, _call_next)
-        await m.on_request(ctx, _call_next)
+        await m.on_call_tool(ctx, _call_next)
+        await m.on_call_tool(ctx, _call_next)
 
         # Advance past 1 hour — old timestamps pruned
         monkeypatch.setattr(time, "monotonic", lambda: now + 3601)
-        result = await m.on_request(ctx, _call_next)
+        result = await m.on_call_tool(ctx, _call_next)
         assert result == "ok"
 
     @pytest.mark.asyncio
@@ -328,9 +328,9 @@ class TestRateLimitMiddleware:
         ctx_a = _make_middleware_context(username="userA")
         ctx_b = _make_middleware_context(username="userB")
 
-        await m.on_request(ctx_a, _call_next)
+        await m.on_call_tool(ctx_a, _call_next)
         # userA is at limit; userB should still pass
-        result = await m.on_request(ctx_b, _call_next)
+        result = await m.on_call_tool(ctx_b, _call_next)
         assert result == "ok"
 
     @pytest.mark.asyncio
@@ -340,8 +340,8 @@ class TestRateLimitMiddleware:
         m = RateLimitMiddleware(limit=2)
         ctx = _make_middleware_context(username="ken")
 
-        await m.on_request(ctx, _call_next)
-        await m.on_request(ctx, _call_next)
+        await m.on_call_tool(ctx, _call_next)
+        await m.on_call_tool(ctx, _call_next)
 
         with pytest.raises(ToolError, match="2 requests/hour"):
-            await m.on_request(ctx, _call_next)
+            await m.on_call_tool(ctx, _call_next)
