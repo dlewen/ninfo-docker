@@ -192,3 +192,24 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 locals().update({k: v for k, v in _oidc.items()
                  if k not in ("AUTHENTICATION_BACKENDS", "LOGIN_URL")})
+
+# @decision DEC-LOGCONF-001 (2026-04-17): Root logger format includes %(name)s so plugin module names surface in Docker logs. Why: interleaved stdout from multiple plugins was ambiguous; plugins using logging.getLogger(__name__) now self-identify. Trade-off: plugins using print() still produce un-namespaced lines — that's a separate per-plugin fix.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "default",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
